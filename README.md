@@ -7,3 +7,4 @@ Bibliotecas:
 - Flask
 - requests
 - beautfulsoup4
+- scikit-learn
