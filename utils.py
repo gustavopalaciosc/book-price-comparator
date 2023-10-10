@@ -2,10 +2,20 @@ import requests
 from bs4 import BeautifulSoup as bs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from text_unidecode import unidecode
 
 def search_set(search):
     text = search.replace(" ", "+")
     return text
+
+def get_soup(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        html_content = response.text
+        soup = bs(html_content, 'html.parser')
+        return soup
+    else:
+        return response.status_code
 
 """
 *********************
@@ -25,13 +35,13 @@ def scrape_buscalibre(search, autor=None):
         # presentes en la página
 
         if autor == None:
-            autor = books[0].find('div', class_='autor').text
+            autor = unidecode(books[0].find('div', class_='autor').text)
         
         vectorizer = TfidfVectorizer()
         min_price_book = None
 
         for book in books:
-            vectors = vectorizer.fit_transform([autor, str(book.find('div', class_='autor').text)])
+            vectors = vectorizer.fit_transform([autor, unidecode(str(book.find('div', class_='autor').text))])
             similarity = cosine_similarity(vectors)
             is_author = float(similarity[0][1]) > 0.25 
             if is_author:
@@ -63,21 +73,16 @@ def scrape_buscalibre(search, autor=None):
 
 def scrape_greenlibros(search = None, autor = None):
     url = "https://www.greenlibros.com/search?q=guerra+y+paz"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        html_content = response.text
-        soup = bs(html_content, 'html.parser')
+    soup = get_soup(url)
+    if soup:
         book_container = soup.find("div", class_="search-list")
         books = book_container.find_all("div", class_="search-item")
         for i in books:
             print("\n")
             print(i.find("a").get('href'))
 
-
-    
     else:
-        return None
+        return soup
 
 
 
