@@ -8,3 +8,4 @@ Bibliotecas:
 - requests
 - beautfulsoup4
 - scikit-learn
+- text-unidecode
