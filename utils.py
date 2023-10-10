@@ -1,19 +1,21 @@
 import requests
 from bs4 import BeautifulSoup as bs
-import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
+def search_set(search):
+    text = search.replace(" ", "+")
+    return text
 
 """
 *********************
 **** Busca Libre ****
 *********************
 """
-def scrape_buscalibre(search=None, autor=None):
+def scrape_buscalibre(search, autor=None):
 
-    url = f'https://www.buscalibre.cl/libros/search?q={search}&page=1'
-    url_ejemplo = f'https://www.buscalibre.cl/libros/search?q=hacia+rutas+salvajes'
-    response = requests.get(url_ejemplo)
+    url = f'https://www.buscalibre.cl/libros/search?q={search_set(search)}'
+    response = requests.get(url)
 
     if response.status_code == 200:
         html_content = response.text
@@ -27,33 +29,72 @@ def scrape_buscalibre(search=None, autor=None):
             autor = books[0].find('div', class_='autor').text
         
         vectorizer = TfidfVectorizer()
+        min_price_book = None
 
         for book in books:
-            print("\n")
-            print(book.find('h3', class_='nombre margin-top-10 text-align-left').text)
-            print(book.find('div', class_='autor').text)
-            print(book['data-precio'])
             vectors = vectorizer.fit_transform([autor, str(book.find('div', class_='autor').text)])
             similarity = cosine_similarity(vectors)
-            print(similarity)
+            is_author = float(similarity[0][1]) > 0.25 
+            if is_author:
+                #title = book.find('h3', class_='nombre margin-top-10 text-align-left').text
+                #author = book.find('div', class_='autor').text
+                try:
+                    price = int(book['data-precio'])
+                except:
+                    price = None
+
+                if price:
+                    if min_price_book == None:
+                        min_price_book = price
+                    else:
+                        if price < min_price_book:
+                            min_price_book = price
+        return {'Autor': autor, 'Titulo': search, 'Precio': min_price_book}
+
+
+                
+            
 
     else:
         print("Algo salió mal")
 
 
 
+"""
+**********************
+**** Green Libros ****
+**********************
+"""
 
-
-
-def scrape_greenlibros(search):
+def scrape_greenlibros(search, autor = None):
     pass
 
-def scrape_librabooks(search):
+
+
+"""
+**********************
+**** Libra Books ****
+**********************
+"""
+
+def scrape_librabooks(search, autor = None):
     pass
 
-def scrape_antartica(search):
+
+"""
+****************************
+**** Librería Antartida ****
+****************************
+"""
+
+def scrape_antartica(search, autor = None):
+    pass
+
+
+def scrape_general(search, autor = None):
     pass
 
 
 if __name__ == "__main__":
-    scrape_buscalibre()
+    a = scrape_buscalibre('guerra y paz')
+    print(a)
