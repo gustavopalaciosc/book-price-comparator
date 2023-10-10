@@ -72,7 +72,7 @@ def scrape_greenlibros(search = None, autor = None):
         books = book_container.find_all("div", class_="search-item")
         for i in books:
             print("\n")
-            print(i)
+            print(i.find("a").get('href'))
 
 
     
