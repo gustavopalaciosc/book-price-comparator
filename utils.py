@@ -13,7 +13,6 @@ def search_set(search):
 *********************
 """
 def scrape_buscalibre(search, autor=None):
-
     url = f'https://www.buscalibre.cl/libros/search?q={search_set(search)}'
     response = requests.get(url)
 
@@ -51,12 +50,8 @@ def scrape_buscalibre(search, autor=None):
                             min_price_book = price
         return {'Autor': autor, 'Titulo': search, 'Precio': min_price_book}
 
-
-                
-            
-
     else:
-        print("Algo salió mal")
+        return None
 
 
 
@@ -66,8 +61,24 @@ def scrape_buscalibre(search, autor=None):
 **********************
 """
 
-def scrape_greenlibros(search, autor = None):
-    pass
+def scrape_greenlibros(search = None, autor = None):
+    url = "https://www.greenlibros.com/search?q=guerra+y+paz"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        html_content = response.text
+        soup = bs(html_content, 'html.parser')
+        book_container = soup.find("div", class_="search-list")
+        books = book_container.find_all("div", class_="search-item")
+        for i in books:
+            print("\n")
+            print(i)
+
+
+    
+    else:
+        return None
+
 
 
 
@@ -96,5 +107,6 @@ def scrape_general(search, autor = None):
 
 
 if __name__ == "__main__":
-    a = scrape_buscalibre('guerra y paz')
-    print(a)
+    #a = scrape_buscalibre('guerra y paz')
+    #print(a)
+    scrape_greenlibros()
