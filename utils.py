@@ -91,12 +91,13 @@ def scrape_greenlibros(search, autor = None):
                 for book in books:
                     url_libro = f'https://www.greenlibros.com{book.find("a").get("href")}'
                     try:
-                        sleep(1)
+                        sleep(0.5)
                         soup_book = get_soup(url_libro)
                         soup_book = soup_book.find("div", class_="product-info-main product-details")
                         autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
                         precio = soup_book.find("div", class_="price-final").find("span").text
                         precio = int(precio.replace("$", "").replace(".", ""))
+                        
 
                         for tag in autor_tag:
                             try:
@@ -134,7 +135,19 @@ def scrape_greenlibros(search, autor = None):
 """
 
 def scrape_librabooks(search, autor = None):
-    pass
+    url = 'https://librabooks.cl/search?q=hacia+rutas+salvajes'
+
+    soup = get_soup(url)
+    print(soup)
+
+
+
+
+
+
+
+
+
 
 
 """
@@ -144,7 +157,29 @@ def scrape_librabooks(search, autor = None):
 """
 
 def scrape_antartica(search, autor = None):
-    pass
+    url = 'https://www.antartica.cl/catalogsearch/result/index/?q=+guerra+y+paz'
+    soup = get_soup(url)
+    vectorizer = TfidfVectorizer()
+    min_price = None
+
+    if soup:
+        books = soup.find_all("li", class_='item product product-item')
+        for book in books:
+            author = book.find("a", class_='link-autor-search-result').text
+            author_bool = is_author(vectorizer, autor, author)
+            if author_bool:
+                print(author)
+    
+    return 0
+
+
+
+
+
+
+
+
+
 
 
 def scrape_general(search, autor = None):
@@ -152,7 +187,6 @@ def scrape_general(search, autor = None):
 
 
 if __name__ == "__main__":
-    #a = scrape_buscalibre('guerra y paz')
-    #print(a)
-    b = scrape_greenlibros("don quijote de la mancha", "Miguel de Cervantes")
-    print(b)
+    a = scrape_antartica('guerra y paz', 'leon tolstoi')
+    print(a)
+   
