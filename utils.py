@@ -9,13 +9,16 @@ def search_set(search):
     return text
 
 def get_soup(url):
-    response = requests.get(url)
+    try:
+        response = requests.get(url)
+    except:
+        return None
     if response.status_code == 200:
         html_content = response.text
         soup = bs(html_content, 'html.parser')
         return soup
     else:
-        return response.status_code
+        return None
 
 """
 *********************
@@ -24,11 +27,9 @@ def get_soup(url):
 """
 def scrape_buscalibre(search, autor=None):
     url = f'https://www.buscalibre.cl/libros/search?q={search_set(search)}'
-    response = requests.get(url)
+    soup = get_soup(url)
 
-    if response.status_code == 200:
-        html_content = response.text
-        soup = bs(html_content, 'html.parser')
+    if soup:
         book_container = soup.find("div", class_="productos pais42")
         books = book_container.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
         # La lista elementos contienen todos los bloques con la información de los respectivos libros 
@@ -71,18 +72,30 @@ def scrape_buscalibre(search, autor=None):
 **********************
 """
 
-def scrape_greenlibros(search = None, autor = None):
-    url = "https://www.greenlibros.com/search?q=guerra+y+paz"
-    soup = get_soup(url)
-    if soup:
-        book_container = soup.find("div", class_="search-list")
-        books = book_container.find_all("div", class_="search-item")
-        for i in books:
-            print("\n")
-            print(i.find("a").get('href'))
+def scrape_greenlibros(search, autor = None):
+    page = 1
+    busqueda = search_set(search)
+    
+    while True:
+        url = f'https://www.greenlibros.com/search?page={page}&q={busqueda}'
+        soup = get_soup(url)
+        
+        if soup:
+            book_container = soup.find("div", class_="search-list")
+            books = book_container.find_all("div", class_="search-item")
+            print(f"Largo: {len(books)}")
+            if len(books) > 0:
+                for i in books:
+                    print("\n")
+                    url_libro = f'https://www.greenlibros.com{i.find("a").get("href")}'
+                    print(url_libro)
+                page += 1
+            else:
+                break
 
-    else:
-        return soup
+        else:
+            return soup
+            
 
 
 
@@ -114,4 +127,4 @@ def scrape_general(search, autor = None):
 if __name__ == "__main__":
     #a = scrape_buscalibre('guerra y paz')
     #print(a)
-    scrape_greenlibros()
+    scrape_greenlibros("don quijote de la mancha")
