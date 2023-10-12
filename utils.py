@@ -187,9 +187,6 @@ def scrape_general(search, autor):
             'librabooks': precio_librabooks, 'antartica': precio_antartica}
 
 
-if __name__ == "__main__":
-    ans = scrape_general('cien años de soledad', 'gabriel garcia marquez')
-    print(ans)
-    
+
     
    
