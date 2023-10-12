@@ -98,16 +98,15 @@ def scrape_greenlibros(search, autor = None):
                         autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
                         precio = soup_book.find("div", class_="price-final").find("span").text
                         precio = int(precio.replace("$", "").replace(".", ""))
-                        
-
+                
                         for tag in autor_tag:
                             try:
-                                autor_book = tag['title']
+                                author = tag['title']
                                 break
                             except KeyError:
                                 pass
                         
-                        bool_author = is_author(vectorizer, autor, autor_book)
+                        bool_author = is_author(vectorizer, autor, author)
                         if bool_author:
                             if min_price_book == None:
                                 min_price_book = precio  
