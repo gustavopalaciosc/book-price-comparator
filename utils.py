@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
 from time import sleep
+import re
 
 
 def search_set(search):
@@ -22,8 +23,8 @@ def get_soup(url):
     else:
         return None
 
-def is_author(vectorizer, autor1, autor2):
-    vectors = vectorizer.fit_transform([autor1, autor2])
+def text_comp(vectorizer, text1, text2):
+    vectors = vectorizer.fit_transform([text1, text2])
     similarity = cosine_similarity(vectors)
     bool_author = float(similarity[0][1]) > 0.25 
     return bool_author
@@ -62,7 +63,7 @@ def scrape_buscalibre(search, autor):
                     else:
                         if price < min_price_book:
                             min_price_book = price
-        return {'Autor': autor, 'Titulo': search, 'Precio': min_price_book}
+        return min_price_book
     else:
         return None
 
@@ -72,7 +73,7 @@ def scrape_buscalibre(search, autor):
 **********************
 """
 
-def scrape_greenlibros(search, autor = None):
+def scrape_greenlibros(search, autor):
     page = 1
     busqueda = search_set(search)
     min_price_book = None
@@ -103,7 +104,7 @@ def scrape_greenlibros(search, autor = None):
                             except KeyError:
                                 pass
                         
-                        bool_author = is_author(vectorizer, autor, author)
+                        bool_author = text_comp(vectorizer, autor, author)
                         if bool_author:
                             if min_price_book == None:
                                 min_price_book = precio  
@@ -131,21 +132,34 @@ def scrape_greenlibros(search, autor = None):
 **********************
 """
 
-def scrape_librabooks(search, autor = None):
-    url = 'https://librabooks.cl/search?q=hacia+rutas+salvajes'
-
+def scrape_librabooks(search, autor):
+    url = f'https://librabooks.cl/search?q={search_set(search)}'
     soup = get_soup(url)
-    print(soup)
-
-
-
-
-
-
-
-
-
-
+    min_price = None
+    vectorizer = TfidfVectorizer()
+    
+    if soup:
+        books = soup.find_all('div', class_='product-block')
+        for book in books:
+            not_available = book.find("a").get("class")
+            if not not_available:
+                ref = book.find("a").get("href")
+                book_url = f'https://librabooks.cl{ref}'
+                sleep(0.5)
+                book_soup = get_soup(book_url)
+                if book_soup:
+                    book_content = book_soup.find("div", class_='tab-content')\
+                    .find("div", class_='tab-pane fade')
+                    author = book_content.find("p").text
+                    if text_comp(vectorizer, autor, author):
+                        price = book_soup.find("span", class_='product-form_price').text
+                        price = int(price.replace(".", "").replace("$", ""))
+                        if not min_price or price < min_price:
+                            min_price = price
+        return min_price
+    else:
+        return None
+        
 
 """
 ****************************
@@ -162,7 +176,7 @@ def scrape_antartica(search, autor):
         books = soup.find_all("li", class_='item product product-item')
         for book in books:
             author = book.find("a", class_='link-autor-search-result').text
-            author_bool = is_author(vectorizer, autor, author)
+            author_bool = text_comp(vectorizer, autor, author)
             if author_bool:
                 price = float(book.find('span', {'data-price-amount': True})['data-price-amount'])
                 price = int(round(price))
@@ -171,26 +185,15 @@ def scrape_antartica(search, autor):
                 else:
                     if price < min_price:
                         min_price = price
-    return min_price
-
+        return min_price
+    else:
+        return None
     
-    
-
-
-
-
-
-
-
-
-
-
-
 def scrape_general(search, autor = None):
     pass
 
 
 if __name__ == "__main__":
-    a = scrape_antartica('don quijote de la mancha', 'miguel de cervantes')
+    a = scrape_librabooks('anna karenina', 'Leon tolstoi')
     print(a)
    
