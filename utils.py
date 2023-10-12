@@ -27,7 +27,6 @@ def is_author(vectorizer, autor1, autor2):
     bool_author = float(similarity[0][1]) > 0.25 
     return bool_author
 
-
 """
 *********************
 **** Busca Libre ****
@@ -38,17 +37,16 @@ def scrape_buscalibre(search, autor):
     soup = get_soup(url)
 
     if soup:
+        vectorizer = TfidfVectorizer()
+        min_price_book = None
         book_container = soup.find("div", class_="productos pais42")
         books = book_container.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
         # La lista elementos contienen todos los bloques con la información de los respectivos libros 
         # presentes en la página
 
-        if autor == None:
+        if autor == None: ###### Despues borrar este if statement #########
             autor = unidecode(books[0].find('div', class_='autor').text)
         
-        vectorizer = TfidfVectorizer()
-        min_price_book = None
-
         for book in books:
             vectors = vectorizer.fit_transform([autor, unidecode(str(book.find('div', class_='autor').text))])
             similarity = cosine_similarity(vectors)
@@ -60,7 +58,6 @@ def scrape_buscalibre(search, autor):
                     price = int(book['data-precio'])
                 except:
                     price = None
-
                 if price:
                     if min_price_book == None:
                         min_price_book = price
@@ -68,11 +65,8 @@ def scrape_buscalibre(search, autor):
                         if price < min_price_book:
                             min_price_book = price
         return {'Autor': autor, 'Titulo': search, 'Precio': min_price_book}
-
     else:
         return None
-
-
 
 """
 **********************
@@ -83,6 +77,8 @@ def scrape_buscalibre(search, autor):
 def scrape_greenlibros(search, autor = None):
     page = 1
     busqueda = search_set(search)
+    min_price_book = None
+    vectorizer = TfidfVectorizer()
     
     while True:
         url = f'https://www.greenlibros.com/search?page={page}&q={busqueda}'
@@ -95,38 +91,42 @@ def scrape_greenlibros(search, autor = None):
                 for book in books:
                     url_libro = f'https://www.greenlibros.com{book.find("a").get("href")}'
                     try:
-                        sleep(2)
+                        sleep(1)
                         soup_book = get_soup(url_libro)
                         soup_book = soup_book.find("div", class_="product-info-main product-details")
                         autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
                         precio = soup_book.find("div", class_="price-final").find("span").text
-                        precio = precio.replace("$", "").replace(".", "")
+                        precio = int(precio.replace("$", "").replace(".", ""))
 
                         for tag in autor_tag:
                             try:
-                                autor = tag['title']
+                                autor_book = tag['title']
                                 break
                             except KeyError:
                                 pass
-                        print(autor)
-                        print(precio)
+                        
+                        bool_author = is_author(vectorizer, autor, autor_book)
+                        if bool_author:
+                            if min_price_book == None:
+                                min_price_book = precio  
+                            else:
+                                if precio < min_price_book:
+                                    min_price_book = precio
+                        else:
+                            pass
                     except:
                         pass
-
-
-
-
                 page += 1
             else:
-                return None
-
+                break
         else:
-            return soup
+            break
+    
+    if min_price_book:
+        return {'Autor': autor, 'Titulo': search, 'Precio': min_price_book}
+    else:
+        return None
             
-
-
-
-
 """
 **********************
 **** Libra Books ****
@@ -154,4 +154,5 @@ def scrape_general(search, autor = None):
 if __name__ == "__main__":
     #a = scrape_buscalibre('guerra y paz')
     #print(a)
-    scrape_greenlibros("don quijote de la mancha")
+    b = scrape_greenlibros("don quijote de la mancha", "Miguel de Cervantes")
+    print(b)
