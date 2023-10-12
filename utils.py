@@ -5,6 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
 from time import sleep
 
+
 def search_set(search):
     text = search.replace(" ", "+")
     return text
@@ -156,21 +157,28 @@ def scrape_librabooks(search, autor = None):
 ****************************
 """
 
-def scrape_antartica(search, autor = None):
-    url = 'https://www.antartica.cl/catalogsearch/result/index/?q=+guerra+y+paz'
+def scrape_antartica(search, autor):
+    url = f'https://www.antartica.cl/catalogsearch/result/index/?q=+{search_set(search)}'
     soup = get_soup(url)
     vectorizer = TfidfVectorizer()
     min_price = None
-
     if soup:
         books = soup.find_all("li", class_='item product product-item')
         for book in books:
             author = book.find("a", class_='link-autor-search-result').text
             author_bool = is_author(vectorizer, autor, author)
             if author_bool:
-                print(author)
+                price = float(book.find('span', {'data-price-amount': True})['data-price-amount'])
+                price = int(round(price))
+                if not min_price:
+                    min_price = price
+                else:
+                    if price < min_price:
+                        min_price = price
+    return min_price
+
     
-    return 0
+    
 
 
 
@@ -187,6 +195,6 @@ def scrape_general(search, autor = None):
 
 
 if __name__ == "__main__":
-    a = scrape_antartica('guerra y paz', 'leon tolstoi')
+    a = scrape_antartica('don quijote de la mancha', 'miguel de cervantes')
     print(a)
    
