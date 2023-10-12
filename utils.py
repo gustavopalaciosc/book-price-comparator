@@ -21,6 +21,13 @@ def get_soup(url):
     else:
         return None
 
+def is_author(vectorizer, autor1, autor2):
+    vectors = vectorizer.fit_transform([autor1, autor2])
+    similarity = cosine_similarity(vectors)
+    bool_author = float(similarity[0][1]) > 0.25 
+    return bool_author
+
+
 """
 *********************
 **** Busca Libre ****
