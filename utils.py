@@ -44,9 +44,6 @@ def scrape_buscalibre(search, autor):
         books = book_container.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
         # La lista elementos contienen todos los bloques con la información de los respectivos libros 
         # presentes en la página
-
-        if autor == None: ###### Despues borrar este if statement #########
-            autor = unidecode(books[0].find('div', class_='autor').text)
         
         for book in books:
             vectors = vectorizer.fit_transform([autor, unidecode(str(book.find('div', class_='autor').text))])
