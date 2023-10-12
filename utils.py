@@ -24,7 +24,7 @@ def get_soup(url):
         return None
 
 def text_comp(vectorizer, text1, text2):
-    vectors = vectorizer.fit_transform([text1, text2])
+    vectors = vectorizer.fit_transform([unidecode(text1), unidecode(text2)])
     similarity = cosine_similarity(vectors)
     bool_author = float(similarity[0][1]) > 0.25 
     return bool_author
@@ -37,33 +37,29 @@ def text_comp(vectorizer, text1, text2):
 def scrape_buscalibre(search, autor):
     url = f'https://www.buscalibre.cl/libros/search?q={search_set(search)}'
     soup = get_soup(url)
-
+    min_price_book = None
+    vectorizer = TfidfVectorizer()
     if soup:
-        vectorizer = TfidfVectorizer()
-        min_price_book = None
         book_container = soup.find("div", class_="productos pais42")
-        books = book_container.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
-        # La lista elementos contienen todos los bloques con la información de los respectivos libros 
-        # presentes en la página
-        
-        for book in books:
-            vectors = vectorizer.fit_transform([autor, unidecode(str(book.find('div', class_='autor').text))])
-            similarity = cosine_similarity(vectors)
-            is_author = float(similarity[0][1]) > 0.25 
-            if is_author:
-                #title = book.find('h3', class_='nombre margin-top-10 text-align-left').text
-                #author = book.find('div', class_='autor').text
-                try:
-                    price = int(book['data-precio'])
-                except:
-                    price = None
-                if price:
-                    if min_price_book == None:
-                        min_price_book = price
-                    else:
-                        if price < min_price_book:
+        if book_container:
+            books = book_container.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
+            for book in books:
+                is_author = text_comp(vectorizer, autor, str(book.find('div', class_='autor').text))
+                if is_author:
+                    #title = book.find('h3', class_='nombre margin-top-10 text-align-left').text
+                    try:
+                        price = int(book['data-precio'])
+                    except:
+                        price = None
+                    if price:
+                        if min_price_book == None:
                             min_price_book = price
-        return min_price_book
+                        else:
+                            if price < min_price_book:
+                                min_price_book = price
+            return min_price_book
+        else:
+            return None
     else:
         return None
 
@@ -94,23 +90,15 @@ def scrape_greenlibros(search, autor):
                         soup_book = get_soup(url_libro)
                         soup_book = soup_book.find("div", class_="product-info-main product-details")
                         autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
+                        titulo = soup_book.find(id="popup_cart_title").text
                         precio = soup_book.find("div", class_="price-final").find("span").text
                         precio = int(precio.replace("$", "").replace(".", ""))
-                
-                        for tag in autor_tag:
-                            try:
-                                author = tag['title']
-                                break
-                            except KeyError:
-                                pass
-                        
+                        author = autor_tag[0]['title']
                         bool_author = text_comp(vectorizer, autor, author)
-                        if bool_author:
-                            if min_price_book == None:
+                        bool_title = text_comp(vectorizer, search, titulo)
+                        if bool_author and bool_title:
+                            if min_price_book == None or precio < min_price_book:
                                 min_price_book = precio  
-                            else:
-                                if precio < min_price_book:
-                                    min_price_book = precio
                         else:
                             pass
                     except:
@@ -122,7 +110,7 @@ def scrape_greenlibros(search, autor):
             break
     
     if min_price_book:
-        return {'Autor': autor, 'Titulo': search, 'Precio': min_price_book}
+        return min_price_book
     else:
         return None
             
@@ -189,11 +177,19 @@ def scrape_antartica(search, autor):
     else:
         return None
     
-def scrape_general(search, autor = None):
-    pass
+def scrape_general(search, autor):
+    precio_buscalibre = scrape_buscalibre(search, autor)
+    precio_greenlibros = scrape_greenlibros(search, autor)
+    precio_librabooks = scrape_librabooks(search, autor)
+    precio_antartica = scrape_antartica(search, autor)
+
+    return {'buscalibre': precio_buscalibre, 'greenlibros': precio_greenlibros,
+            'librabooks': precio_librabooks, 'antartica': precio_antartica}
 
 
 if __name__ == "__main__":
-    a = scrape_librabooks('anna karenina', 'Leon tolstoi')
-    print(a)
+    ans = scrape_general('cien años de soledad', 'gabriel garcia marquez')
+    print(ans)
+    
+    
    
