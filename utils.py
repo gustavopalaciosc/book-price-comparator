@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as bs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
+from time import sleep
 
 def search_set(search):
     text = search.replace(" ", "+")
@@ -25,7 +26,7 @@ def get_soup(url):
 **** Busca Libre ****
 *********************
 """
-def scrape_buscalibre(search, autor=None):
+def scrape_buscalibre(search, autor):
     url = f'https://www.buscalibre.cl/libros/search?q={search_set(search)}'
     soup = get_soup(url)
 
@@ -83,15 +84,34 @@ def scrape_greenlibros(search, autor = None):
         if soup:
             book_container = soup.find("div", class_="search-list")
             books = book_container.find_all("div", class_="search-item")
-            print(f"Largo: {len(books)}")
             if len(books) > 0:
-                for i in books:
-                    print("\n")
-                    url_libro = f'https://www.greenlibros.com{i.find("a").get("href")}'
-                    print(url_libro)
+                for book in books:
+                    url_libro = f'https://www.greenlibros.com{book.find("a").get("href")}'
+                    try:
+                        sleep(2)
+                        soup_book = get_soup(url_libro)
+                        soup_book = soup_book.find("div", class_="product-info-main product-details")
+                        autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
+                        precio = soup_book.find("div", class_="price-final").find("span").text
+                        precio = precio.replace("$", "").replace(".", "")
+
+                        for tag in autor_tag:
+                            try:
+                                autor = tag['title']
+                                break
+                            except KeyError:
+                                pass
+                        print(autor)
+                        print(precio)
+                    except:
+                        pass
+
+
+
+
                 page += 1
             else:
-                break
+                return None
 
         else:
             return soup
