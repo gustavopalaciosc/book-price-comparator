@@ -168,11 +168,8 @@ def scrape_antartica(search, autor):
             if author_bool:
                 price = float(book.find('span', {'data-price-amount': True})['data-price-amount'])
                 price = int(round(price))
-                if not min_price:
+                if not min_price or price < min_price:
                     min_price = price
-                else:
-                    if price < min_price:
-                        min_price = price
         return min_price
     else:
         return None
