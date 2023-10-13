@@ -12,8 +12,10 @@ def index():
 
 @app.route('/scrape')
 def scrape():
+    title = "guerra y paz"
+    autor = "leon tolstoi"
     ans = [scrape_antartica("guerra y paz", "leon tolstoi")]
-    return render_template("price_comparison.html", headlines = ans)
+    return render_template("price_comparison.html", books = ans)
 
     
 
