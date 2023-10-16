@@ -51,11 +51,8 @@ def scrape_buscalibre(search, autor):
                     except:
                         price = None
                     if price:
-                        if min_price_book == None:
+                        if min_price_book == None or price < min_price_book:
                             min_price_book = price
-                        else:
-                            if price < min_price_book:
-                                min_price_book = price
             return min_price_book
     else:
         return None
