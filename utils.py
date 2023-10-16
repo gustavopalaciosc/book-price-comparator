@@ -4,7 +4,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
 from time import sleep
-import re
 
 
 def search_set(search):
@@ -40,13 +39,13 @@ def scrape_buscalibre(search, autor):
     min_price_book = None
     vectorizer = TfidfVectorizer()
     if soup:
-        book_container = soup.find("div", class_="productos pais42")
-        if book_container:
-            books = book_container.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
+            books = soup.find_all("div", class_=lambda x: x and x.startswith('box-producto'))
             for book in books:
+                title = book.find('h3', class_='nombre margin-top-10 text-align-left').text
                 is_author = text_comp(vectorizer, autor, str(book.find('div', class_='autor').text))
-                if is_author:
-                    #title = book.find('h3', class_='nombre margin-top-10 text-align-left').text
+                is_title = text_comp(vectorizer, search, title.lower())
+                not_available = book.find('p', class_="precio-ahora margin-0 font-size-medium")
+                if is_author and not not_available and is_title:
                     try:
                         price = int(book['data-precio'])
                     except:
@@ -58,8 +57,6 @@ def scrape_buscalibre(search, autor):
                             if price < min_price_book:
                                 min_price_book = price
             return min_price_book
-        else:
-            return None
     else:
         return None
 
@@ -185,5 +182,6 @@ def scrape_general(search, autor):
 
 
 
-    
+if __name__ == "__main__":
+    pass
    
