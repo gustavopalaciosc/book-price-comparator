@@ -1,6 +1,5 @@
 # Comparador de Precios de Libros
 
-
 ## Setup
 
 Bibliotecas:
