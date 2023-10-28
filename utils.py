@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as bs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
-from time import sleep
+from time import sleep, time
 
 
 def search_set(search):
@@ -80,7 +80,6 @@ def scrape_greenlibros(search, autor):
                 for book in books:
                     url_libro = f'https://www.greenlibros.com{book.find("a").get("href")}'
                     try:
-                        sleep(0.5)
                         soup_book = get_soup(url_libro)
                         soup_book = soup_book.find("div", class_="product-info-main product-details")
                         autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
@@ -121,23 +120,17 @@ def scrape_librabooks(search, autor):
     vectorizer = TfidfVectorizer()
     
     if soup:
-        books = soup.find_all('div', class_='product-block')
+        books = soup.find_all('div', class_='col-lg-3 col-md-4 col-6')
         for book in books:
-            not_available = book.find("a").get("class")
-            if not not_available:
-                ref = book.find("a").get("href")
-                book_url = f'https://librabooks.cl{ref}'
-                sleep(0.5)
-                book_soup = get_soup(book_url)
-                if book_soup:
-                    book_content = book_soup.find("div", class_='tab-content')\
-                    .find("div", class_='tab-pane fade')
-                    author = book_content.find("p").text
-                    if text_comp(vectorizer, autor, author):
-                        price = book_soup.find("span", class_='product-form_price').text
-                        price = int(price.replace(".", "").replace("$", ""))
-                        if not min_price or price < min_price:
-                            min_price = price
+            if text_comp(vectorizer, book.find('h3').find('a').text, search):
+                ref = book.find('div', class_='product-block').find('a').get('href')
+                book_soup = get_soup(f"https://librabooks.cl{ref}")
+                author = book_soup.find('div', class_="col-12 mt-5").find('p').text
+                price = book_soup.find('span', class_="product-form_price").text
+                price = int(price.replace("$", "").replace(".", ""))
+                if text_comp(vectorizer, author, autor):
+                    if not min_price or price < min_price:
+                        min_price = price
         return min_price
     else:
         return None
@@ -180,5 +173,11 @@ def scrape_general(search, autor):
 
 
 if __name__ == "__main__":
-    pass
+    start_time = time()
+    ans = scrape_librabooks("don quijote de la mancha", "miguel de cervantes")
+    print(ans)
+    end_time = time()
+
+    exe_time = end_time - start_time
+    print(f"Execution time: {exe_time}")
    
