@@ -15,15 +15,10 @@ def search_book():
         # Procesa los datos del formulario aquí
         titulo = request.form['title']
         autor = request.form['author']
-        ans = [scrape_buscalibre(titulo, autor)]
+        ans = scrape_general(titulo, autor)
         # Realiza alguna acción con los datos, por ejemplo, mostrarlos en otra página
         return render_template("price_comparison.html", books = ans)
     return render_template('search.html')
-
-
-
-
-
 
 
 
@@ -31,12 +26,7 @@ def search_book():
 def about():
     return render_template('about.html')
 
-@app.route('/scrape')
-def scrape():
-    title = "guerra y paz"
-    autor = "leon tolstoi"
-    ans = [scrape_buscalibre("guerra y paz", "leon tolstoi")]
-    return render_template("price_comparison.html", books = ans)
+
 
     
 

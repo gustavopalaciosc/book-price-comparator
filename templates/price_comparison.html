@@ -5,11 +5,15 @@
  <title>Book Prices</title>
 </head>
 <body>
- <h1>Precio de Libros</h1>
- <ul>
- {% for book in books %}
- <li>{{ book }}</li>
- {% endfor %}
- </ul>
+
+    <h1>Precio de Libros</h1>
+    <ul>
+
+    <li>Busca Libre: {{ books["buscalibre"] }}</li>
+    <li>Libra Books: {{ books["librabooks"] }}</li>
+    <li>Green Libros: {{ books["greenlibros"] }}</li>
+    <li>Librería Antartica: {{ books["antartica"] }}</li>
+
+    </ul>
 </body>
 </html>
