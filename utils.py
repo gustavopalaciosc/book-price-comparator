@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup as bs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
+from threading import Thread, Lock
 from time import sleep, time
+import concurrent.futures
 
 
 def search_set(search):
@@ -143,17 +145,17 @@ def scrape_librabooks(search, autor):
 """
 
 def scrape_antartica(search, autor):
-    url = f'https://www.antartica.cl/catalogsearch/result/index/?q=+{search_set(search)}'
+    url = f'https://www.antartica.cl/catalogsearch/result/index/?q={search_set(search)}'
     soup = get_soup(url)
     vectorizer = TfidfVectorizer()
     min_price = None
     if soup:
         books = soup.find_all("li", class_='item product product-item')
-        for book in books:
-            author = book.find("a", class_='link-autor-search-result').text
+        for i in range(0, 9):
+            author = books[i].find("a", class_='link-autor-search-result').text
             author_bool = text_comp(vectorizer, autor, author)
             if author_bool:
-                price = float(book.find('span', {'data-price-amount': True})['data-price-amount'])
+                price = float(books[i].find('span', {'data-price-amount': True})['data-price-amount'])
                 price = int(round(price))
                 if not min_price or price < min_price:
                     min_price = price
@@ -161,11 +163,19 @@ def scrape_antartica(search, autor):
     else:
         return None
     
+
 def scrape_general(search, autor):
-    precio_buscalibre = scrape_buscalibre(search, autor)
-    precio_greenlibros = scrape_greenlibros(search, autor)
-    precio_librabooks = scrape_librabooks(search, autor)
-    precio_antartica = scrape_antartica(search, autor)
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_buscalibre = executor.submit(scrape_buscalibre, search, autor)
+        future_greenlibros = executor.submit(scrape_greenlibros, search, autor)
+        future_librabooks = executor.submit(scrape_librabooks, search, autor)
+        future_antartica = executor.submit(scrape_antartica, search, autor)
+
+        precio_buscalibre = future_buscalibre.result()
+        precio_greenlibros = future_greenlibros.result()
+        precio_librabooks = future_librabooks.result()
+        precio_antartica = future_antartica.result()
 
     return {'buscalibre': precio_buscalibre, 'greenlibros': precio_greenlibros,
             'librabooks': precio_librabooks, 'antartica': precio_antartica}
@@ -174,8 +184,7 @@ def scrape_general(search, autor):
 
 if __name__ == "__main__":
     start_time = time()
-    ans = scrape_librabooks("don quijote de la mancha", "miguel de cervantes")
-    print(ans)
+    ans = scrape_general("El quijote de la mancha", "Miguel de Cervantes")
     end_time = time()
 
     exe_time = end_time - start_time
