@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Book Prices</title>
+    <title>Book Prices</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
     <div class="nav-bar">
-        <a class="active" href="/">Inicio</a>
-        <a href="search">Buscar Libros</a>
-        <a href="about">Como funciona</a>
+        <ul>
+            <li><a href="default.asp">Home</a></li>
+            <li><a href="news.asp">News</a></li>
+            <li><a href="contact.asp">Contact</a></li>
+            <li><a href="about.asp">About</a></li>
+        </ul>
     </div>
 
 

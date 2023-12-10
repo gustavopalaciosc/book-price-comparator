@@ -1,0 +1,18 @@
+body {
+    background-color: rgb(34, 34, 34);
+}
+
+h1 {
+    font-family: monospace;
+    color: rgb(69, 242, 124);
+}
+
+li {
+    display: inline;
+}
+
+a {
+    display: block;
+    padding: 8px;
+    background-color: #dddddd;
+}

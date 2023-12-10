@@ -3,7 +3,7 @@ from utils import scrape_general, scrape_antartica, scrape_buscalibre
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 @app.route("/")
 def index():
