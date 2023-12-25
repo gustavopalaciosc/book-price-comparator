@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html>
-<head>
+<html lang="en">
+  <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
@@ -8,21 +8,44 @@
       content="width=device-width, initial-scale=1.
     0"
     />
-    <title>Book Prices</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
-</head>
-<body>
-    <ul>
-        <li><a href="default.asp">Home</a></li>
-        <li><a href="news.asp">News</a></li>
-        <li><a href="contact.asp">Contact</a></li>
-        <li><a href="about.asp">About</a></li>
-    </ul>
-    
-<h1>Sean bienvenidos</h1>
+    <title>Document</title>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-container">
+        <h1>Cheaper Book</h1>
 
+        <ul class="nav-menu">
+          <li class="active"><a href="/">Home</a></li>
+          <li><a href="/search">Buscar libro</a></li>
+          <li>About</li>
+        </ul>
 
+        <div class="nav-right">
+          <button></button>
 
+          <div class="hamburger">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </div>
+        </div>
+      </div>
+    </nav>
 
-</body>
+    <section class="hero">
+      <div class="hero-container">
+        <div class="hero-heading">
+          <h1>Compara los precios de libros en distintas tiendas, todo en un mismo lugar.</h1>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider-container">
+      <h1 id="typing-text"></h1>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
 </html>
