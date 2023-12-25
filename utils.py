@@ -3,8 +3,7 @@ from bs4 import BeautifulSoup as bs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from text_unidecode import unidecode
-from threading import Thread, Lock
-from time import sleep, time
+from time import time
 import concurrent.futures
 
 
