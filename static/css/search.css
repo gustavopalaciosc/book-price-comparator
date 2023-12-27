@@ -147,7 +147,7 @@ nav {
 }
 
 .form-container {
-    align-items: center;
+    text-align: center;
 }
 
 @media only screen and (max-width: 768px) {
