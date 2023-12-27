@@ -167,16 +167,16 @@ def scrape_general(search, autor):
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future_buscalibre = executor.submit(scrape_buscalibre, search, autor)
-        future_greenlibros = executor.submit(scrape_greenlibros, search, autor)
+        #future_greenlibros = executor.submit(scrape_greenlibros, search, autor)
         future_librabooks = executor.submit(scrape_librabooks, search, autor)
         future_antartica = executor.submit(scrape_antartica, search, autor)
 
         precio_buscalibre = future_buscalibre.result()
-        precio_greenlibros = future_greenlibros.result()
+        #precio_greenlibros = future_greenlibros.result()
         precio_librabooks = future_librabooks.result()
         precio_antartica = future_antartica.result()
 
-    return {'buscalibre': precio_buscalibre, 'greenlibros': precio_greenlibros,
+    return {'buscalibre': precio_buscalibre,
             'librabooks': precio_librabooks, 'antartica': precio_antartica}
 
 

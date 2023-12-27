@@ -3,15 +3,36 @@
 <head>
  <meta charset="UTF-8">
  <title>Book Prices</title>
+ <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
+    <nav>
+        <div class="nav-container">
+          <h1>Babel</h1>
+  
+          <ul class="nav-menu">
+            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/search">Buscar libro</a></li>
+            <li>About</li>
+          </ul>
+  
+          <div class="nav-right">
+            <button></button>
+  
+            <div class="hamburger">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </div>
+          </div>
+        </div>
+      </nav>
 
     <h1>Precio de Libros</h1>
     <ul>
 
     <li>Busca Libre: {{ books["buscalibre"] }}</li>
     <li>Libra Books: {{ books["librabooks"] }}</li>
-    <li>Green Libros: {{ books["greenlibros"] }}</li>
     <li>Librería Antartica: {{ books["antartica"] }}</li>
 
     </ul>
