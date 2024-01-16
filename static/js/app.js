@@ -1,40 +1,14 @@
-const hamburger = document.querySelector('.hamburger')
-const navMenu = document.querySelector('.nav-menu')
+const observer = new IntersectionObserver((entries) =>{
+  entries.forEach((entry) => {
+      console.log(entry)
+      if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+      } else {
+          entry.target.classList.remove('show');
+      }
 
-hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('active')
-  navMenu.classList.toggle('active')
-})
+  });
+});
 
-
-
-
-const textToType = ["Busca Libre", "Green Libros", "Libra Books", " Librería Antartica"];
-let currentIndex = 0;
-let currentText = "";
-let deleting = false;
-
-function typeText() {
-  if (currentIndex >= textToType.length) {
-    currentIndex = 0;
-  }
-
-  currentText = deleting
-    ? textToType[currentIndex].substring(0, currentText.length - 1)
-    : textToType[currentIndex].substring(0, currentText.length + 1);
-
-  document.getElementById("typing-text").textContent = currentText;
-
-  if (!deleting && currentText === textToType[currentIndex]) {
-    deleting = true;
-    setTimeout(typeText, 1000);
-  } else if (deleting && currentText === "") {
-    deleting = false;
-    currentIndex++;
-    setTimeout(typeText, 500);
-  } else {
-    setTimeout(typeText, deleting ? 100 : 200);
-  }
-}
-
-typeText();
+const hiddenElements = document.querySelectorAll('.hidden');
+hiddenElements.forEach((el) => observer.observe(el));

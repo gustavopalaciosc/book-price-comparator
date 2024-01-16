@@ -1,51 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.
-    0"
-    />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
-    <title>Babel</title>
-  </head>
-  <body>
-    <nav>
-      <div class="nav-container">
-        <h1>Babel</h1>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Babel</title>
 
-        <ul class="nav-menu">
-          <li class="active"><a href="/">Home</a></li>
-          <li><a href="/search">Buscar libro</a></li>
-          <li>About</li>
-        </ul>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+        <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
 
-        <div class="nav-right">
-          <button></button>
+    </head>
+    <body>
+        <div class="main-content">
+            <h1>Babel</h1>
 
-          <div class="hamburger">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-          </div>
+            <section class="hidden">
+                <h1>Bienvenidos a Babel</h1>
+                <p>Compara miles de precios de libros, todo en un mismo lugar.</p>
+            </section>
+
+            <img src="babel.jpg" alt="babel">
+            <figcaption>Así es como se ve una comparación de precios a mano...</figcaption>
+
+            <section class="hidden">
+                <h2>¿Como busco un libro?</h2>
+                <p>Muy simple, solo rellena el formulario con el nombre y el título del libro que quieres buscar, y ya estarás comparando entre varias tiendas.</p>
+            </section>
+
+            <section class="hidden">
+                <h2>Más información, mejores compras</h2>
+                <p>Así de simple. Busca miles de titulos y compra libros a los mejores precios.</p>
+                <a href="\search">
+                    <button type="button" class="search-button">Buscar</button>
+                </a>
+                
+            </section>
         </div>
-      </div>
-    </nav>
-
-    <section class="hero">
-      <div class="hero-container">
-        <div class="hero-heading">
-          <h1>Compara los precios de libros en distintas tiendas, todo en un mismo lugar.</h1>
-        </div>
-      </div>
-    </section>
-
-    <div class="divider-container">
-      <h1 id="typing-text"></h1>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-  </body>
+        
+        
+    </body>
 </html>
