@@ -1,53 +1,32 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Babel | Buscar libro</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.
-    0"
-    />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/search.css') }}">
-</head>
-<body>
-    <nav>
-        <div class="nav-container">
-          <h1>Babel</h1>
-  
-          <ul class="nav-menu">
-            <li class="active"><a href="/">Home</a></li>
-            <li><a href="/search">Buscar libro</a></li>
-            <li>About</li>
-          </ul>
-  
-          <div class="nav-right">
-            <button></button>
-  
-            <div class="hamburger">
-              <span class="bar"></span>
-              <span class="bar"></span>
-              <span class="bar"></span>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Babel</title>
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/search.css') }}">
+        <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+    </head>
+    <body>
+        <div class="main-content">
+            <h1>Babel</h1>
+
+            <div class="form-container">
+                <div class="form-input">
+                    <form method="POST" action="/search" id="book-form">
+                        <label for="title">Titulo</label><br>
+                        <input type="text" name="title" id="title" required><br>
+                        <label for="author">Autor</label><br>
+                        <input type="text" name="author" id="author" required><br> 
+                    </form>
+                    <button type="submit" form="book-form" value="Submit">Buscar Libro</button>
+                </div>
             </div>
-          </div>
-        </div>
-    </nav>
 
-    <div class="form-container">
-      <div class="form-input">
-        <form method="POST" action="/search" id="book-form">
-            <label for="title">Titulo</label><br>
-            <input type="text" name="title" id="title" required><br>
-            <label for="author">Autor</label><br>
-            <input type="text" name="author" id="author" required><br>
             
-           
-        </form>
-        <button type="submit" form="book-form" value="Submit">Buscar Libro</button>
-      </div>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-
-</body>
+        </div>
+    </body>
 </html>
