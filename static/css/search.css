@@ -22,6 +22,12 @@ h1 {
     font-size: 30px;
 }
 
+a {
+    text-decoration: none;
+    color: #ffffff;
+  }
+  
+
 .form-container {
     display: flex;
     justify-content: center;
