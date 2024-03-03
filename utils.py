@@ -13,15 +13,19 @@ def search_set(search):
 
 def get_soup(url):
     try:
-        response = requests.get(url)
+        # Agregamos un Header para evitar una respuesta negativa por parte del servidor (403)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+        response = requests.get(url, headers=headers)
+        print(response.status_code)
+        if response.status_code == 200:
+            html_content = response.text
+            soup = bs(html_content, 'html.parser')
+            return soup
+        else:
+            return None
     except:
         return None
-    if response.status_code == 200:
-        html_content = response.text
-        soup = bs(html_content, 'html.parser')
-        return soup
-    else:
-        return None
+    
 
 def text_comp(vectorizer, text1, text2):
     vectors = vectorizer.fit_transform([unidecode(text1), unidecode(text2)])
@@ -56,6 +60,7 @@ def scrape_buscalibre(search, autor):
                             min_price_book = price
             return min_price_book
     else:
+        print("False")
         return None
 
 """
@@ -149,16 +154,19 @@ def scrape_antartica(search, autor):
     vectorizer = TfidfVectorizer()
     min_price = None
     if soup:
-        books = soup.find_all("li", class_='item product product-item')
-        for i in range(0, 9):
-            author = books[i].find("a", class_='link-autor-search-result').text
-            author_bool = text_comp(vectorizer, autor, author)
-            if author_bool:
-                price = float(books[i].find('span', {'data-price-amount': True})['data-price-amount'])
-                price = int(round(price))
-                if not min_price or price < min_price:
-                    min_price = price
-        return min_price
+        try:
+            books = soup.find_all("li", class_='item product product-item')
+            for i in range(0, 9):
+                author = books[i].find("a", class_='link-autor-search-result').text
+                author_bool = text_comp(vectorizer, autor, author)
+                if author_bool:
+                    price = float(books[i].find('span', {'data-price-amount': True})['data-price-amount'])
+                    price = int(round(price))
+                    if not min_price or price < min_price:
+                        min_price = price
+            return min_price
+        except:
+            return None
     else:
         return None
     
@@ -183,9 +191,12 @@ def scrape_general(search, autor):
 
 if __name__ == "__main__":
     start_time = time()
-    ans = scrape_general("El quijote de la mancha", "Miguel de Cervantes")
+    #ans = scrape_general("Clean code", "Robert C Martin")
+    ans = scrape_buscalibre("Clean Code", "Robert Martin")
     end_time = time()
 
     exe_time = end_time - start_time
     print(f"Execution time: {exe_time}")
+    print("\nResult:\n")
+    print(ans)
    
