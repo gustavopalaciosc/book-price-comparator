@@ -126,16 +126,16 @@ def scrape_librabooks(search, autor):
     vectorizer = TfidfVectorizer()
     
     if soup:
-        books = soup.find_all('div', class_='col-lg-3 col-md-4 col-6')
+        books = soup.find_all('div', class_=lambda x: x and x.startswith('col-lg-3 col-md-4 col-6'))[0:3]
         for book in books:
             if text_comp(vectorizer, book.find('h3').find('a').text, search):
                 ref = book.find('div', class_='product-block').find('a').get('href')
                 book_soup = get_soup(f"https://librabooks.cl{ref}")
-                author = book_soup.find('div', class_="col-12 mt-5").find('p').text
+                author = book_soup.find('span', class_="product-custom_field_value").text
                 price = book_soup.find('span', class_="product-form_price").text
                 price = int(price.replace("$", "").replace(".", ""))
-                if text_comp(vectorizer, author, autor):
-                    if not min_price or price < min_price:
+                if not min_price or price < min_price:
+                    if text_comp(vectorizer, author, autor):
                         min_price = price
         return min_price
     else:
@@ -192,7 +192,8 @@ def scrape_general(search, autor):
 if __name__ == "__main__":
     start_time = time()
     #ans = scrape_general("Clean code", "Robert C Martin")
-    ans = scrape_buscalibre("Clean Code", "Robert Martin")
+    #ans = scrape_buscalibre("Clean Code", "Robert Martin")
+    ans = scrape_librabooks("Un verdor terrible", "Benjamin Labatut")
     end_time = time()
 
     exe_time = end_time - start_time
