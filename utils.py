@@ -88,7 +88,7 @@ def scrape_greenlibros(search, autor):
                 for book in books:
                     url_libro = f'https://www.greenlibros.com{book.find("a").get("href")}'
                     try:
-                        soup_book = get_soup(url_libro)
+                        soup_book = get_soup(url_libro)[0]
                         soup_book = soup_book.find("div", class_="product-info-main product-details")
                         autor_tag = soup_book.find("div", class_="product_meta").find_all("a")
                         titulo = soup_book.find(id="popup_cart_title").text
@@ -132,7 +132,7 @@ def scrape_librabooks(search, autor):
         for book in books:
             if text_comp(vectorizer, book.find('h3').find('a').text, search):
                 ref = book.find('div', class_='product-block').find('a').get('href')
-                book_soup = get_soup(f"https://librabooks.cl{ref}")
+                book_soup = get_soup(f"https://librabooks.cl{ref}")[0]
                 author = book_soup.find('span', class_="product-custom_field_value").text
                 price = book_soup.find('span', class_="product-form_price").text
                 price = int(price.replace("$", "").replace(".", ""))
