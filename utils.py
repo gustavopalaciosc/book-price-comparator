@@ -16,15 +16,17 @@ def get_soup(url):
         # Agregamos un Header para evitar una respuesta negativa por parte del servidor (403)
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
         response = requests.get(url, headers=headers)
+        print(response.url)
         print(response.status_code)
         if response.status_code == 200:
             html_content = response.text
             soup = bs(html_content, 'html.parser')
-            return soup
+            return soup, response.url
         else:
             return None
     except:
         return None
+    
     
 
 def text_comp(vectorizer, text1, text2):
@@ -40,7 +42,7 @@ def text_comp(vectorizer, text1, text2):
 """
 def scrape_buscalibre(search, autor):
     url = f'https://www.buscalibre.cl/libros/search?q={search_set(search)}'
-    soup = get_soup(url)
+    soup = get_soup(url)[0]
     min_price_book = None
     vectorizer = TfidfVectorizer()
     if soup:
@@ -77,7 +79,7 @@ def scrape_greenlibros(search, autor):
     
     while True:
         url = f'https://www.greenlibros.com/search?page={page}&q={busqueda}'
-        soup = get_soup(url)
+        soup = get_soup(url)[0]
         
         if soup:
             book_container = soup.find("div", class_="search-list")
@@ -121,7 +123,7 @@ def scrape_greenlibros(search, autor):
 
 def scrape_librabooks(search, autor):
     url = f'https://librabooks.cl/search?q={search_set(search)}'
-    soup = get_soup(url)
+    soup = get_soup(url)[0]
     min_price = None
     vectorizer = TfidfVectorizer()
     
@@ -150,20 +152,27 @@ def scrape_librabooks(search, autor):
 
 def scrape_antartica(search, autor):
     url = f'https://www.antartica.cl/catalogsearch/result/index/?q={search_set(search)}'
-    soup = get_soup(url)
+    soup, final_url = get_soup(url)
     vectorizer = TfidfVectorizer()
     min_price = None
     if soup:
         try:
-            books = soup.find_all("li", class_='item product product-item')
-            for i in range(0, 9):
-                author = books[i].find("a", class_='link-autor-search-result').text
+            if "catalogsearch" in final_url:
+                books = soup.find_all("li", class_='item product product-item')
+                for i in range(0, 9):
+                    author = books[i].find("a", class_='link-autor-search-result').text
+                    author_bool = text_comp(vectorizer, autor, author)
+                    if author_bool:
+                        price = float(books[i].find('span', {'data-price-amount': True})['data-price-amount'])
+                        price = int(round(price))
+                        if not min_price or price < min_price:
+                            min_price = price
+            else:
+                author = soup.find("div", class_="autor").text
+                price = int(soup.find("span", class_="price").text.replace(".", "").replace("$", ""))
                 author_bool = text_comp(vectorizer, autor, author)
                 if author_bool:
-                    price = float(books[i].find('span', {'data-price-amount': True})['data-price-amount'])
-                    price = int(round(price))
-                    if not min_price or price < min_price:
-                        min_price = price
+                    min_price = price
             return min_price
         except:
             return None
@@ -193,7 +202,8 @@ if __name__ == "__main__":
     start_time = time()
     #ans = scrape_general("Clean code", "Robert C Martin")
     #ans = scrape_buscalibre("Clean Code", "Robert Martin")
-    ans = scrape_librabooks("Un verdor terrible", "Benjamin Labatut")
+    #ans = scrape_librabooks("Un verdor terrible", "Benjamin Labatut")
+    ans = scrape_antartica("Un verdor terrible", "Benjamin Labatut")
     end_time = time()
 
     exe_time = end_time - start_time
