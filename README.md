@@ -7,16 +7,16 @@ El siguiente repositorio contiene el código de una scrapper de precios de libro
 Actualmente la página web esta hosteada en Render. Se puede visitar [aquí](https://babel-ggh9.onrender.com)
 
 
-## Ejecución de la App
+## SetUp
 
-Luego de clonar el respositorio localmente, se deberá correr el siguiente comando para descargar los paquetes necesarios para su funcionamiento.
 
 ```
 pip install -r requirements.txt
+flask run
 ```
 
 
-## Setup
+## Bibliotecas utilizadas
 
 Bibliotecas:
 - Flask
