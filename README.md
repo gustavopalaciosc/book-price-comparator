@@ -17,8 +17,6 @@ flask run
 
 
 ## Librerías utilizadas
-
-Bibliotecas:
 - Flask
 - requests
 - beautfulsoup4
