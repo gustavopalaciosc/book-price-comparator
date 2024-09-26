@@ -16,7 +16,7 @@ flask run
 ```
 
 
-## Bibliotecas utilizadas
+## Librerías utilizadas
 
 Bibliotecas:
 - Flask
